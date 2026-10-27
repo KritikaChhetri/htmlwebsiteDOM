@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DOM Implementation</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f6fb;
+      color: #243047;
+      line-height: 1.5;
+    }
+    header {
+      background: #2447a8;
+      color: white;
+      text-align: center;
+      padding: 28px 16px;
+    }
+    header h1 { margin: 0 0 8px; }
+    main {
+      width: min(900px, 92%);
+      margin: 26px auto;
+      display: grid;
+      gap: 22px;
+    }
+    section {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(25, 45, 90, 0.08);
+    }
+    h2 { color: #2447a8; margin-top: 0; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .full { grid-column: 1 / -1; }
+    label { font-weight: bold; }
+    input, select {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #c9d2e3;
+      border-radius: 7px;
+      font-size: 15px;
+    }
+    input:focus, select:focus {
+      outline: 2px solid #a9bcff;
+      border-color: #2447a8;
+    }
+    button {
+      border: 0;
+      border-radius: 7px;
+      background: #2447a8;
+      color: white;
+      padding: 11px 16px;
+      font-size: 15px;
+      cursor: pointer;
+      margin: 5px 5px 5px 0;
+    }
+    button:hover { background: #17347f; }
+    .secondary { background: #5a6478; }
+    .message {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 7px;
+      background: #eef3ff;
+      min-height: 44px;
+    }
+    .success { color: #17663a; background: #e9f8ef; }
+    .error { color: #a12626; background: #fff0f0; }
+    #interactiveBox {
+      margin-top: 14px;
+      padding: 22px;
+      text-align: center;
+      border-radius: 9px;
+      background: #eef3ff;
+      transition: background 0.2s;
+    }
+    #interactiveText { font-size: 18px; font-weight: bold; }
+    footer { text-align: center; padding: 16px; color: #68748a; }
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .full { grid-column: auto; }
+      section { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>DOM Implementation</h1>
+    <p>Registration Form and Interactive Button Page</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. Registration Form</h2>
+      <p>Enter your details and click Register. JavaScript DOM methods will read and display your information.</p>
+      <form id="registrationForm">
+        <div class="form-grid">
+          <div class="field">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" placeholder="Enter your name" required>
+          </div>
+          <div class="field">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="Enter your email" required>
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="At least 6 characters" minlength="6" required>
+          </div>
+          <div class="field">
+            <label for="course">Course</label>
+            <select id="course" required>
+              <option value="">Select a course</option>
+              <option value="BCA">BCA</option>
+              <option value="B.Sc. Data Science">B.Sc. Data Science</option>
+              <option value="BBA">BBA</option>
+              <option value="MCA">MCA</option>
+            </select>
+          </div>
+          <div class="field full">
+            <button type="submit">Register</button>
+            <button type="reset" class="secondary">Clear Form</button>
+          </div>
+        </div>
+      </form>
+      <div id="registrationMessage" class="message" aria-live="polite">Your registration details will appear here.</div>
+    </section>
+
+    <section>
+      <h2>2. Interactive Page Using Buttons</h2>
+      <p>Click the buttons to see how DOM events can change page content and style.</p>
+      <button id="changeTextBtn">Change Text</button>
+      <button id="changeColorBtn">Change Background</button>
+      <button id="showMessageBtn">Show Message</button>
+      <button id="resetBtn" class="secondary">Reset</button>
+      <div id="interactiveBox">
+        <p id="interactiveText">Welcome! Click a button to interact with this page.</p>
+        <p id="buttonMessage" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>Created using HTML, CSS and JavaScript DOM methods.</footer>
+
+  <script>
+    // Registration form: select elements from the DOM and handle form submission.
+    const registrationForm = document.getElementById("registrationForm");
+    const registrationMessage = document.getElementById("registrationMessage");
+
+    registrationForm.addEventListener("submit", function (event) {
+      event.preventDefault(); // Prevent the page from reloading.
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const course = document.getElementById("course").value;
+
+      if (!name || !email || !password || !course) {
+        registrationMessage.textContent = "Please fill in all fields.";
+        registrationMessage.className = "message error";
+        return;
+      }
+
+      if (password.length < 6) {
+        registrationMessage.textContent = "Password must contain at least 6 characters.";
+        registrationMessage.className = "message error";
+        return;
+      }
+
+      // Use textContent rather than inserting user input as HTML.
+      registrationMessage.replaceChildren();
+      const heading = document.createElement("strong");
+      heading.textContent = "Registration successful!";
+      const details = document.createElement("p");
+      details.textContent = "Name: " + name + " | Email: " + email + " | Course: " + course;
+      registrationMessage.append(heading, details);
+      registrationMessage.className = "message success";
+      // This is a demonstration only; the details are not saved to a server.
+    });
+
+    registrationForm.addEventListener("reset", function () {
+      registrationMessage.textContent = "Your registration details will appear here.";
+      registrationMessage.className = "message";
+    });
+
+    // Interactive page: respond to button click events using DOM properties.
+    const interactiveText = document.getElementById("interactiveText");
+    const buttonMessage = document.getElementById("buttonMessage");
+    const interactiveBox = document.getElementById("interactiveBox");
+
+    document.getElementById("changeTextBtn").addEventListener("click", function () {
+      interactiveText.textContent = "The text has been changed using the DOM!";
+    });
+
+    document.getElementById("changeColorBtn").addEventListener("click", function () {
+      interactiveBox.style.backgroundColor =
+        interactiveBox.style.backgroundColor === "rgb(255, 240, 220)" ? "#eef3ff" : "#fff0dc";
+    });
+
+    document.getElementById("showMessageBtn").addEventListener("click", function () {
+      buttonMessage.textContent = "Hello! You clicked the button successfully.";
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", function () {
+      interactiveText.textContent = "Welcome! Click a button to interact with this page.";
+      buttonMessage.textContent = "";
+      interactiveBox.style.backgroundColor = "#eef3ff";
+    });
+  </script>
+</body>
+</html>
